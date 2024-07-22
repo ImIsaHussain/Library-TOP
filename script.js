@@ -13,6 +13,11 @@ function book(title, author, pages, read) {
 }
 
 function addBookToLibrary(title, author, pages, read) {
+    if (read == true) {
+        read = "read";
+    } else {
+        read = "not read yet";
+    }
     const newBook = new book(title, author, pages, read);
     myLibrary.push(newBook);
 }
@@ -22,23 +27,39 @@ function displayBooks() {
     const booksContainer = document.getElementById('books-container');
     booksContainer.innerHTML = ''; // Clear the container
 
-    myLibrary.forEach(book => {
+    myLibrary.forEach((book, index) => {
         const bookElement = document.createElement('div');
-        bookElement.classList.add('book');
+        bookElement.classList.add(`book`);
+        bookElement.id = `book-${index}`;
         bookElement.innerHTML = `
             <h2>${book.title}</h2>
             <p>Author: ${book.author}</p>
             <p>Pages: ${book.pages}</p>
-            <p>Status: ${book.read}<p>
+            <p>Status: <span id="status-${index}">${book.read ? 'Read' : 'Not Read'}</span></p>
+            <button id="toggle-read-${index}">Toggle Read Status</button>
+            <button id="remove-book-${index}">Delete</button>
         `;
+
         booksContainer.appendChild(bookElement);
+
+        document.getElementById(`toggle-read-${index}`).addEventListener('click', () => {
+            book.read = !book.read; // Toggle the read status
+            document.getElementById(`status-${index}`).textContent = book.read ? 'Read' : 'Not Read'; // Update the display
+        });
+
+        document.getElementById(`remove-book-${index}`).addEventListener("click", () => {
+            document.getElementById(`book-${index}`).remove();
+            myLibrary.splice(index, 1);
+
+            displayBooks();
+        });
     });
 }
 
 // Add placeholder books to the library
-addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', 295, 'read');
-addBookToLibrary('1984', 'George Orwell', 328, 'not read yet');
-addBookToLibrary('To Kill a Mockingbird', 'Harper Lee', 281, 'read');
+addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', 295, true);
+addBookToLibrary('1984', 'George Orwell', 328, false);
+addBookToLibrary('To Kill a Mockingbird', 'Harper Lee', 281, true);
 
 // Make sure to call displayBooks() after adding the books to update the UI
 displayBooks();
